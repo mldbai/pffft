@@ -152,7 +152,7 @@ typedef __m128 v4sf;
 /*
   ARM NEON support macros
 */
-#elif !defined(PFFFT_SIMD_DISABLE) && defined(__arm__) 
+#elif !defined(PFFFT_SIMD_DISABLE) && (defined(__arm__) || defined (__aarch64__))
 #  include <arm_neon.h>
 typedef float32x4_t v4sf;
 #  define SIMD_SZ 4
@@ -245,10 +245,12 @@ void validate_pffft_simd() {
   printf("VSWAPHL(4:7,8:11)=[%2g %2g %2g %2g]\n", t.f[0], t.f[1], t.f[2], t.f[3]);
   assertv4(t, 8, 9, 6, 7);
   VTRANSPOSE4(a0.v, a1.v, a2.v, a3.v);
+#if !defined(__aarch64__)  // ICE in GCC 4.8
   printf("VTRANSPOSE4(0:3,4:7,8:11,12:15)=[%2g %2g %2g %2g] [%2g %2g %2g %2g] [%2g %2g %2g %2g] [%2g %2g %2g %2g]\n", 
          a0.f[0], a0.f[1], a0.f[2], a0.f[3], a1.f[0], a1.f[1], a1.f[2], a1.f[3], 
          a2.f[0], a2.f[1], a2.f[2], a2.f[3], a3.f[0], a3.f[1], a3.f[2], a3.f[3]); 
   assertv4(a0, 0, 4, 8, 12); assertv4(a1, 1, 5, 9, 13); assertv4(a2, 2, 6, 10, 14); assertv4(a3, 3, 7, 11, 15);
+#endif
 }
 #endif //!PFFFT_SIMD_DISABLE
 
